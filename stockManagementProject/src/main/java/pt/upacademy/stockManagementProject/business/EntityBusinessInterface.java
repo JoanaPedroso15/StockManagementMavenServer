@@ -12,9 +12,9 @@ public interface EntityBusinessInterface <T extends Entity> {
 	
 	Collection<Long> getAllIds ();
 	
-	long save (T entity);
+	long save (T entity) throws Exception;
 	
-	void update (T entity);
+	void update (T entity) throws Exception;
 	
 	void delete (long id);
 	

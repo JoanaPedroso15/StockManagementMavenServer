@@ -1,6 +1,7 @@
 package pt.upacademy.stockManagementProject.controllers;
 
 import java.util.Collection;
+import java.util.List;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -12,6 +13,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import pt.upacademy.stockManagementProject.business.EntityBusiness;
@@ -35,10 +37,31 @@ public abstract class EntityController <T extends EntityBusiness <R,E>, R extend
  @POST 
  @Consumes (MediaType.APPLICATION_JSON)
  @Produces (MediaType.TEXT_PLAIN)
- public long addEntity (E ent) {
-		 busEnt.save(ent);
-		 return ent.getID();
+ public Response addEntity (E ent)  {
+	 	try {
+	 		busEnt.save(ent);
+	 	}
+	 	catch (Exception e) {
+	 		
+		 return Response.status(Response.Status.BAD_REQUEST).entity("Nao foi possivel criar a entidade. " + e.getMessage()).build();
 	 }
+	 	return Response.status(Response.Status.OK).entity(ent).build();	
+ }
+ 
+ @POST 
+ @Path("list")
+ @Consumes (MediaType.APPLICATION_JSON)
+ @Produces (MediaType.TEXT_PLAIN)
+ public Response addEntityList (List <E> listEnts) {
+	 try {
+		 for (E ent : listEnts) {
+			 busEnt.save(ent);
+		 } 
+	 } catch (Exception e) {
+		 return Response.status(Response.Status.BAD_REQUEST).entity("Nao foi possivel criar a entidade. " + e.getMessage()).build(); 
+	 }
+	 return Response.status(Response.Status.OK).entity(listEnts).build();	
+ }
  
  @GET
  @Produces (MediaType.APPLICATION_JSON)
@@ -57,10 +80,13 @@ public abstract class EntityController <T extends EntityBusiness <R,E>, R extend
  @Path("/{id}")
  @Consumes (MediaType.APPLICATION_JSON)
  @Produces (MediaType.APPLICATION_JSON)
- public E updateEnt (@PathParam("id") long id, E ent) {
-	 ent = busEnt.get(id);
-	 busEnt.update(ent);
-	 return ent;
+ public Response updateEnt (@PathParam("id") long id, E ent) {
+	 try {
+		 busEnt.update(ent); 
+	 } catch (Exception e) {
+		 return Response.status(Response.Status.BAD_REQUEST).entity("Nao foi possivel editar a entidade. " + e.getMessage()).build(); 
+	 }
+	 return Response.status(Response.Status.OK).entity(ent).build();	
  }
  
 
