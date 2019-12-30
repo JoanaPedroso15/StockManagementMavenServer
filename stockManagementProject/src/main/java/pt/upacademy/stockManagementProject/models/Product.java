@@ -74,6 +74,9 @@ public String toString() {
 			+ "\n PVP:" + pvp;
 }
 
+public static String getName() {
+	return "Product";
+}
 
 
 }

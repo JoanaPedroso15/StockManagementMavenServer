@@ -51,8 +51,9 @@ public Shelf(int capacidade, float dailyPrice) {
 				+ dailyPrice;
 	}	
 	
-	
-	
+public static String getName() {
+	return "Shelf";
+}
 	
 	
 }

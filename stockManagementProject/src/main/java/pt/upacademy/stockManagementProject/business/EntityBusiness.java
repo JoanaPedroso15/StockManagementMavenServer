@@ -3,15 +3,15 @@ package pt.upacademy.stockManagementProject.business;
 import java.util.Collection;
 
 import pt.upacademy.stockManagementProject.models.Entity;
-import pt.upacademy.stockManagementProject.models.Product;
 import pt.upacademy.stockManagementProject.repositories.EntityRepository;
 
-public class EntityBusiness <R extends EntityRepository <E>, E extends Entity> implements EntityBusinessInterface <E> {
+public abstract class EntityBusiness <R extends EntityRepository <E>, E extends Entity> implements EntityBusinessInterface <E> {
 
 protected R repository;
 	
 	@Override
 	public E get(long id) {
+		validate(id);
 		return repository.consultEntity (id);
 	}
 
@@ -48,6 +48,12 @@ protected R repository;
 		return repository.isEmpty();
 	}
 	
-	
+	public void validate (long Id) throws IllegalArgumentException {
+		if (repository.consultEntity (Id) == null) {
+			throw new IllegalArgumentException (String.format("No %s with ID %d", getEntityClassName(), Id));
+		}
+	}
+
+	protected abstract String getEntityClassName();
 
 }

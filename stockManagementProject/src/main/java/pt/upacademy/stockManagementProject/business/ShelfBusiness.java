@@ -32,62 +32,54 @@ public class ShelfBusiness extends EntityBusiness<ShelfRepository, Shelf> implem
 
 	@Override
 	public void update(Shelf shelf) throws Exception {
-		Long productId = productsWithShelf (shelf.getID());
-		if (productId != -1) {
-		alterarProducts(shelf, productId, false);
-		}
+		validate(shelf.getID());
+		Long productIdNew = shelf.getProdutoId();
+		alterarProducts(shelf, productIdNew, false);
 		Collection <Long> listProdIds = prodBus.getAllIds();
 		if (shelf.getProdutoId() != 0) {
 			if (listProdIds.isEmpty()) throw new Exception ("Ainda nao ha produtos criados");
 			if (!listProdIds.contains(shelf.getProdutoId())) throw new Exception ("Ainda nao existe um produto com esse ID");
 		}
 		repository.editEntity(shelf);
-
 	}
 
 	@Override
 	public void delete(long id) { 
-		Long productId = productsWithShelf (id);
-		if (productId != -1) {
-		alterarProducts(repository.consultEntity(id), productId, true);
-		}
+		validate(id);
+		Long prodIdNew = (long) 0;
+		Shelf shelf = repository.consultEntity(id);
+		alterarProducts (shelf, prodIdNew, true);
 		repository.removeEntity(id);
 	}
 
 	
-	public Long productsWithShelf (Long shelfId) {
-		Iterator<Product> prodIterator = prodBus.consultAll().iterator();
-		Long productId = (long) -1;
-		while (prodIterator.hasNext()) {
-			Product prodEl = (Product) prodIterator.next();
-			Long prodId = prodEl.getID();
-			List<Long>listShelves = prodEl.getShelvesIds();
-			if (listShelves.contains(shelfId)) {
-				productId = prodId;
-				}
-		}
-			return productId;
 		
-	}
-		
-	public void alterarProducts (Shelf shelf, long prodId, boolean isRemove) {
-    	Long productInTheShelf = shelf.getProdutoId();
+	public void alterarProducts (Shelf shelf, long prodIdNew, boolean isRemove) {
+		System.out.println("alterarProducts");
+    	Long productInTheShelf = repository.consultEntity(shelf.getID()).getProdutoId();
     	if (productInTheShelf == 0) {
-    		Product prod = prodBus.get(prodId);
+    		Product prod = prodBus.get(prodIdNew);
     		prod.addShelfId(shelf.getID());
-    		shelf.setProdutoId(prodId);
+    		shelf.setProdutoId(prodIdNew);
     	} else {
-    		prodId = shelf.getProdutoId();
-    		Product prod = prodBus.get(prodId);
-    		prod.removeShelfId(shelf.getID());
     		if (!isRemove) {
-    			shelf.setProdutoId(prodId);
+    			Product prod2 = prodBus.get(prodIdNew);
+    			shelf.setProdutoId(prodIdNew);
+    			prod2.addShelfId(shelf.getID());	
+    		}else {
+    			Product prod = prodBus.get(productInTheShelf);
+    			prod.removeShelfId(shelf.getID());
     		}
     		
     	}
 	}
     	
 
+	protected String getEntityClassName() {
+		return Shelf.getName();
+		
+		
+	}
 
 }
     
